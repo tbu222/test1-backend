@@ -12,7 +12,6 @@ import userRoute from './routes/userRoute.js';
 import authRoute from './routes/authRoute.js';
 import videoRoute from './routes/videoRoute.js';
 import commentRoute from './routes/commentRoute.js';
-import generateFake from './mock data/generate fake.js';
 
 
 // connect to db
