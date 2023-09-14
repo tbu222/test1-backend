@@ -282,7 +282,6 @@ export {
 	getSubscribed,
 	getTrend,
 	getRandomVideos,
-	getVideosByTags,
 	search,
 	getHistory,
 	addToHistory,

@@ -13,7 +13,6 @@ import {
 	getSubscribed,
 	getTrend,
 	getRandomVideos,
-	getVideosByTags,
 	search,
 	viewVideo,
 	getHistory,
