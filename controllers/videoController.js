@@ -164,7 +164,7 @@ const getSubscribed = async (req, res, next) => {
 		const userId = req.userData.id;
 		const user = await User.findById(userId);
 		const subscribed = await User.find({
-			_id: { $in: user.subscripedChannels },
+			_id: { $in: user.subscribedChannels },
 		}).select('userVideos');
 		if (!subscribed) return res.status(200).json({ videos: [] });
 
@@ -208,19 +208,10 @@ const getRandomVideos = async (req, res, next) => {
 	}
 };
 
-// TODO
-const getVideosByTags = async (req, res, next) => {
-	try {
-		res.status(200).json('like done');
-	} catch (error) {
-		next(error);
-	}
-};
 const search = async (req, res, next) => {
 	try {
 		const query = req.query.q;
 		if (!query) return next(createError(400, 'query is required'));
-		console.log(query);
 		const videos = await Video.find({
 			title: { $regex: query, $options: 'i' },
 		}).populate({
@@ -237,8 +228,6 @@ const search = async (req, res, next) => {
 
 const addToHistory = async (req, res, next) => {
 	try {
-		console.log('add history');
-
 		const videoId = req.params.id;
 		const userId = req.userData.id;
 
@@ -290,7 +279,6 @@ export {
 	getSubscribed,
 	getTrend,
 	getRandomVideos,
-	getVideosByTags,
 	search,
 	getHistory,
 	addToHistory,

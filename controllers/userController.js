@@ -19,10 +19,10 @@ const getUserById = async (req, res, next) => {
     try {
         const id = req.params.id;
         if (!id || !mongoose.isValidObjectId(id))
-            return next(createError(401, 'valid id is required'))
+            return next(createError(401, 'This is not a valid id'))
 
         const user = await User.findOne({ _id: id });
-        if (!user) return next(createError(404, 'user is not found '))
+        if (!user) return next(createError(404, 'user does not exist'))
 
         res.status(200).json({ user })
     } catch (error) {
@@ -34,14 +34,13 @@ const updateUser = async (req, res, next) => {
     try {
         const id = req.params.id;
         if (!id || !mongoose.isValidObjectId(id))
-            return next(createError(401, 'valid id is required'))
+            return next(createError(401, 'This is not a valid id'))
 
         if (req.userData.id !== id)
-            return next(createError(403, 'you can only update your email'))
+            return next(createError(403, 'You can only update your info'))
 
         let user = await User.findOne({ _id: id });
-        if (!user) return next(createError(404, 'user is not found '))
-        // console.log('test');
+        if (!user) return next(createError(404, 'user does not exist'))
         for (let key in req.body) {
             user[key] = req.body[key];
         }
@@ -55,15 +54,15 @@ const deleteUser = async (req, res, next) => {
     try {
         const id = req.params.id;
         if (!id || !mongoose.isValidObjectId(id))
-            return next(createError(401, 'valid id is required'))
+            return next(createError(401, 'This is not a valid id'))
 
         if (req.userData.id !== id)
-            return next(createError(403, 'you can only delete your email'))
+            return next(createError(403, 'you can only delete your own info'))
         let user = await User.findById(id)
-        if (!user) return next(createError(404, 'user not found'));
+        if (!user) return next(createError(404, 'user does not exist'));
 
         await User.deleteOne({ _id: id });
-        res.status(200).json("user deleted")
+        res.status(200).json("user has been deleted")
     } catch (error) {
         next(error)
     }
@@ -74,24 +73,21 @@ const subscribeUser = async (req, res, next) => {
         const friendId = req.params.id;
         const myId = req.userData.id;
         if (!friendId || !mongoose.isValidObjectId(friendId))
-            return next(createError(401, 'valid id is required'))
-        // if (myId === friendId)
-        //     return next(createError(400, 'you cant subscripe yourself'))
-
+            return next(createError(401, 'this is not a valid id'))
         let friend = await User.findById(friendId);
         let user = await User.findById(myId);
         if (!friend || !user)
             return next(createError(404, 'user not found'))
 
-        if (user.subscripedChannels.includes(friendId)) {
-            // return next(createError(400, 'you already subscriped him'));
-            await User.findByIdAndUpdate(friendId, { $inc: { subscripers: -1 } })
-            await User.findByIdAndUpdate(myId, { $pull: { subscripedChannels: friendId } })
+        if (user.subscribedChannels.includes(friendId)) {
+
+            await User.findByIdAndUpdate(friendId, { $inc: { subscribers: -1 } })
+            await User.findByIdAndUpdate(myId, { $pull: { subscribedChannels: friendId } })
 
             return res.status(200).json("un subscripe done");
         } else {
-            await User.findByIdAndUpdate(friendId, { $inc: { subscripers: 1 } })
-            await User.findByIdAndUpdate(myId, { $addToSet: { subscripedChannels: friendId } })
+            await User.findByIdAndUpdate(friendId, { $inc: { subscribers: 1 } })
+            await User.findByIdAndUpdate(myId, { $addToSet: { subscribedChannels: friendId } })
 
             return res.status(200).json("subscripe done");
         }
@@ -105,23 +101,20 @@ const unsubscribeUser = async (req, res, next) => {
         const friendId = req.params.id;
         const myId = req.userData.id;
         if (!friendId || !mongoose.isValidObjectId(friendId))
-            return next(createError(401, 'valid id is required'))
-        if (myId === friendId)
-            return next(createError(400, 'you cant subscripe yourself'))
+            return next(createError(401, 'This is not a valid id'))
 
         let friend = await User.findById(friendId);
         let user = await User.findById(myId);
         if (!friend || !user)
-            return next(createError(404, 'user not found'))
+            return next(createError(404, 'User does not exist'))
 
-        const isFound = user.subscripedChannels.find((ch) => ch === friendId)
+        const isFound = user.subscribedChannels.find((ch) => ch === friendId)
         if (!isFound)
-            return next(createError(404, 'you didnt subscripe him'))
+            return next(createError(404, 'You did not subscribe to this channel'))
 
-        await User.findByIdAndUpdate(friendId, { $inc: { subscripers: -1 } })
-        await User.findByIdAndUpdate(myId, { $pull: { subscripedChannels: friendId } })
-        console.log('test');
-        res.status(200).json("unsubscripe done");
+        await User.findByIdAndUpdate(friendId, { $inc: { subscribers: -1 } })
+        await User.findByIdAndUpdate(myId, { $pull: { subscribedChannels: friendId } })
+        res.status(200).json("unsubscribed");
     } catch (error) {
         next(error)
     }
@@ -139,7 +132,6 @@ const likeVideo = async (req, res, next) => {
             return next(createError(404, 'video or user not found'))
 
         if (user.likedVideos.includes(videoId)) {
-            // return next(createError(400, 'you already like it'));
             await Video.findByIdAndUpdate(videoId, { $inc: { likes: -1 } })
             await User.findByIdAndUpdate(userId, { $pull: { likedVideos: videoId } })
             res.status(200).json("unlike done");
@@ -168,7 +160,6 @@ const unlikeVideo = async (req, res, next) => {
             return next(createError(404, 'video or user not found'))
 
         if (user.dislikedVideos.includes(videoId)) {
-            // return next(createError(400, 'you already dislike it'));
             await Video.findByIdAndUpdate(videoId, { $inc: { dislikes: -1 } })
             await User.findByIdAndUpdate(userId, { $pull: { dislikedVideos: videoId } })
             res.status(200).json("remove dislike done");
@@ -199,7 +190,6 @@ const saveVideo = async (req, res, next) => {
         if (user.savedVideos.includes(videoId)) {
             await User.findByIdAndUpdate(userId, { $pull: { savedVideos: videoId } })
             res.status(200).json("unSave video done");
-            // return next(createError(400, 'you already saved it'));
         } else {
             await User.findByIdAndUpdate(userId, { $addToSet: { savedVideos: videoId } })
             res.status(200).json("saving video done");
@@ -227,8 +217,6 @@ const unsaveVideo = async (req, res, next) => {
 
 
         await User.findByIdAndUpdate(userId, { $pull: { savedVideos: videoId } })
-        console.log('test');
-
         res.status(200).json("unsaving video done");
     } catch (error) {
         next(error)

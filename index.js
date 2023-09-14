@@ -7,14 +7,13 @@ import cors from 'cors';
 const app = express();
 
 dotenv.config();
-// import  routes
+
 import userRoute from './routes/userRoute.js';
 import authRoute from './routes/authRoute.js';
 import videoRoute from './routes/videoRoute.js';
 import commentRoute from './routes/commentRoute.js';
 
 
-// connect to db
 const dbURI = process.env.MONGODB_URI;
 const PORT = process.env.PORT || 3000;
 
@@ -28,20 +27,18 @@ mongoose
 	.catch((err) => console.log(err));
 Promise = global.Promise;
 
-// Middlewares
+
 app.use(morgan('dev'));
 app.use(cors());
-app.use(express.urlencoded({ extended: true })); // send nested objects
+app.use(express.urlencoded({ extended: true })); 
 app.use(express.json());
 
-// Routes which should handle requests
+
 app.use('/api/auth', authRoute);
 app.use('/api/users', userRoute);
 app.use('/api/videos', videoRoute);
 app.use('/api/comments', commentRoute);
 
-// Promise.all([generateFake()]);
-//error handler
 app.use((err, req, res, next) => {
 	const status = err.status || 500;
 	const message = err.message || 'Something went wrong!';
@@ -52,7 +49,6 @@ app.use((err, req, res, next) => {
 	});
 });
 
-// handle not found routes
 app.use('*', (req, res) => {
 	console.log('wrong route');
 	res.status(404).json({

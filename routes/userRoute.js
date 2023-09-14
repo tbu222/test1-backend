@@ -12,7 +12,7 @@ import {
     saveVideo,
     unsaveVideo
 } from '../controllers/userController.js';
-import verifyAuth from '../middlewares/authMiddlware.js';
+import verifyAuth from '../middlewares/authMiddleware.js';
 
 router.get('/', getAllUsers);
 router.get('/:id', getUserById);

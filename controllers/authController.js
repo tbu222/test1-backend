@@ -5,17 +5,15 @@ import createError from '../utils/error.js';
 
 const singup = async (req, res, next) => {
 	try {
-		// TODO add validationon email and password
 		let pass = req.body.password;
 		let { email, name } = req.body;
 		if (!email || !pass || !name)
-			return next(createError(400, 'Email, name , and password are required'));
+			return next(createError(400, 'Missing either email, name or password'));
 
 		let user = await User.findOne({ email });
 		if (user) return next(createError(409, 'User already exists'));
 
 		const hash = bcrypt.hashSync(pass);
-		// TODO validation on what send within req.body
 		user = new User({ ...req.body, password: hash });
 		const savedUser = await user.save();
 
@@ -28,16 +26,13 @@ const singup = async (req, res, next) => {
 
 const login = async (req, res, next) => {
 	try {
-		console.log(req.body);
 		let email = req.body.email;
 		let pass = req.body.password;
 		if (!email || !pass)
-			return next(createError(400, 'Email , and password are required'));
+			return next(createError(400, 'Missing either email or password'));
 
 		const user = await User.findOne({ email });
-		if (!user) return next(createError(404, 'User not found'));
-		// console.log(user);
-
+		if (!user) return next(createError(404, 'User does not exist'));
 		const isMatch =
 			bcrypt.compareSync(pass, user.password) || pass === user.password;
 
@@ -58,6 +53,4 @@ const login = async (req, res, next) => {
 	}
 };
 
-const googleAuth = async (req, res, next) => {};
-
-export { singup, login, googleAuth };
+export { singup, login};

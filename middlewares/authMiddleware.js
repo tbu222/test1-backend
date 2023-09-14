@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import createError from '../utils/error.js';
 
-// Verify
 const verifyAuth = (req, res, next) => {
 	const token = req.headers.authorization;
 	console.log(token);

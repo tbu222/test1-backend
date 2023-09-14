@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import verifyAuth from '../middlewares/authMiddlware.js';
+import verifyAuth from '../middlewares/authMiddleware.js';
 import { addComment, deleteComment, getAllComments } from '../controllers/commentController.js';
 
 
