@@ -5,32 +5,54 @@ import createError from '../error.js';
 
 export const signUp = async (req,res, next) => {
     try {
-        const salt = bcrypt.genSaltSync(10);
-        const hash = bcrypt.hashSync(req.body.password, salt);
-        const newUser = new User({...req.body, password: hash});
-        await newUser.save();
-        const {password, ...others} = newUser._doc
-        res.status(200).json(others);
-    }catch(err){
-        next(err)
-    }
+		let pass = req.body.password;
+		let { email, name } = req.body;
+		if (!email || !pass || !name)
+			return next(createError(400, 'Email, name , and password are required'));
+
+		let user = await User.findOne({ email });
+		if (user) return next(createError(409, 'User already exists'));
+
+		const hash = bcrypt.hashSync(pass);
+		user = new User({ ...req.body, password: hash });
+		const savedUser = await user.save();
+
+		let { password, ...other } = savedUser._doc;
+		res.status(200).json({ user: other });
+	} catch (error) {
+		next(error);
+	}
 };
 
 export const signIn = async (req,res, next) => {
     try {
-        const user = await User.findOne({name:req.body.name})
-        if (!user) return next(createError(404,"User not found"))
-        const isCorrect = await bcrypt.compare(req.body.password, user.password )
-        if (!isCorrect) return next(createError(404, "Wrong Password"))
-        const token = jwt.sign({id:user._id}, process.env.JWT)
-        const {password, ...others} = user._doc
-        res.cookie("access_token", token,{
-            httpOnly:true,
-        }).status(200).json(others);
+		console.log(req.body);
+		let email = req.body.email;
+		let pass = req.body.password;
+		if (!email || !pass)
+			return next(createError(400, 'Email , and password are required'));
 
-    }catch(err){
-        next(err)
-    }
+		const user = await User.findOne({ email });
+		if (!user) return next(createError(404, 'User not found'));
+
+		const isMatch =
+			bcrypt.compareSync(pass, user.password) || pass === user.password;
+
+		if (!isMatch) return next(createError(401, 'Invalid password'));
+
+		const token = jwt.sign({ id: user._id }, process.env.JWT_KEY, {
+			expiresIn: '24h',
+		});
+		const { password, ...other } = user._doc;
+		res.status(200).json({
+			message: 'Login successful',
+			token: token,
+			user: other,
+		});
+	} catch (error) {
+		console.log(error);
+		next(error);
+	}
 };
 
 export const googleAuth = async (req,res,next)=>{
