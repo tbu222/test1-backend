@@ -7,22 +7,22 @@ const userSchema = new mongoose.Schema(
 		},
 		email: {
 			type: String,
-			required: [true, 'Email is required'],
-			unique: [true, 'Email is already in use'],
+			required: [true],
+			unique: [true],
 		},
 		password: {
 			type: String,
-			minlength: [6, 'Password must be at least 6 characters'],
-			required: [true, 'Password is required'],
+			minlength: [6],
+			required: [true],
 		},
 		img: {
 			type: String,
 		},
-		subscripedChannels: {
+		subscribedChannels: {
 			type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 			default: [],
 		},
-		subscripers: {
+		subscribers: {
 			type: Number,
 			default: 0,
 			min: 0,

@@ -1,18 +1,18 @@
 import mongoose from "mongoose";
-import User from "../models/userModel.js";
-import Video from "../models/videoModel.js";
-import Comment from "../models/commentModel.js";
-import createError from "../utils/error.js";
+import User from "../models/User.js";
+import Video from "../models/Video.js";
+import Comment from "../models/Comment.js";
+import createError from "../error.js";
 
 
 const getAllComments = async (req, res, next) => {
     try {
         const videoId = req.params.videoId;
         if (!videoId || !mongoose.isValidObjectId(videoId))
-            return next(createError(401, 'valid videoId is required'))
+            return next(createError(401, 'not a valid videoId'))
 
         const video = await Video.findOne({ _id: videoId });
-        if (!video) return next(createError(404, 'video is not found '))
+        if (!video) return next(createError(404, 'video does not exist'))
 
 
         const comments = await Comment
@@ -39,13 +39,13 @@ const addComment = async (req, res, next) => {
         const videoId = req.params.videoId;
         const userId = req.userData.id;
         if (!videoId || !mongoose.isValidObjectId(videoId))
-            return next(createError(401, 'valid videoId is required'))
+            return next(createError(401, 'not a valid videoId'))
 
         const video = await Video.findOne({ _id: videoId });
-        if (!video) return next(createError(404, 'video is not found '))
+        if (!video) return next(createError(404, 'video does not exist'))
 
         const user = await User.findOne({ _id: userId });
-        if (!user) return next(createError(404, 'user is not found '))
+        if (!user) return next(createError(404, 'user does not exist'))
         console.log('user', user);
 
 
@@ -73,16 +73,16 @@ const deleteComment = async (req, res, next) => {
         const commentId = req.params.id;
         const userId = req.userData.id;
         if (!commentId || !mongoose.isValidObjectId(commentId))
-            return next(createError(401, 'valid comment id is required'))
+            return next(createError(401, 'not a valid videoId'))
 
         const comment = await Comment.findById(commentId);
-        if (!comment) return next(createError(404, 'comment is not found '))
+        if (!comment) return next(createError(404, 'comment does not exist'))
 
         if (!comment.userId.equals(userId))
-            next(createError(403, 'you can only delete your comment'));
+            next(createError(403, 'not authenticate to delete other people comment'));
 
         await Comment.deleteOne({ _id: commentId });
-        res.status(200).json('comment deleted')
+        res.status(200).json('Comment has been deleted')
     } catch (error) {
         next(error)
     }

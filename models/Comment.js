@@ -5,16 +5,16 @@ const commentSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: [true, 'userId is required']
+        required: [true]
     },
     videoId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Video",
-        required: [true, 'videoId is required']
+        required: [true]
     },
     desc: {
         type: String,
-        required: [true, 'description is required']
+        required: [true]
     }
 },
     { timestamps: true }

@@ -4,23 +4,23 @@ const videoSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: [true, 'userId is required']
+        required: [true]
     },
     title: {
         type: String,
-        required: [true, 'title is required'],
-        unique: [true, 'video name should be unique']
+        required: [true],
+        unique: [true]
     },
     desc: {
         type: String,
     },
     videoUrl: {
         type: String,
-        required: [true, 'title is required']
+        required: [true]
     },
     imgUrl: {
         type: String,
-        required: [true, 'title is required']
+        required: [true]
     },
     likes: {
         type: Number,
