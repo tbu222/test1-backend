@@ -5,7 +5,7 @@ import createError from './error.js';
 export const verifyToken = (req, res, next) => {
 	const token = req.headers.authorization;
 	console.log(token);
-	const JWT = process.env.JWT || 'secret key';
+	const JWT = process.env.JWT_KEY || 'secret key';
 	if (!token) next(createError(401, 'No token provided'));
 
 	try {
