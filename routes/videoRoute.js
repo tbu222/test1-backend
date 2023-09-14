@@ -38,7 +38,6 @@ router.get('/subscribes', verifyAuth, getSubscribed);
 router.get('/trend', getTrend);
 router.get('/random', getRandomVideos);
 
-router.get('/tags', verifyAuth, getVideosByTags);
 router.get('/search', search);
 
 router.get('/history', verifyAuth, getHistory);
