@@ -84,12 +84,12 @@ const subscribeUser = async (req, res, next) => {
             await User.findByIdAndUpdate(friendId, { $inc: { subscribers: -1 } })
             await User.findByIdAndUpdate(myId, { $pull: { subscribedChannels: friendId } })
 
-            return res.status(200).json("un subscripe done");
+            return res.status(200).json("unsubscribed");
         } else {
             await User.findByIdAndUpdate(friendId, { $inc: { subscribers: 1 } })
             await User.findByIdAndUpdate(myId, { $addToSet: { subscribedChannels: friendId } })
 
-            return res.status(200).json("subscripe done");
+            return res.status(200).json("subscribed");
         }
 
     } catch (error) {
